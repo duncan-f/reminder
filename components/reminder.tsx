@@ -91,13 +91,16 @@ const Reminder = ({ reminder }: { reminder: Rdv }) => {
             value={comment as string}
             onChange={(e) => setComment(e.target.value)}
             onBlur={handleUpdate}
-            onKeyDown={handleUpdate}
+            onKeyDown={(e) => {
+              e.key === "Enter" ? handleUpdate : null;
+            }}
+            autoFocus
           />
         ) : reminder.comment ? (
           `${reminder.comment}`
         ) : (
           <span className="text-sm text-muted-foreground">
-            Pas de commentaires!
+            Pas d&apos;obsérvations!
           </span>
         )}
       </CardContent>
