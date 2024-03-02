@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,13 +21,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Rdv } from "@prisma/client";
-import { startTransition } from "react";
-import { remove } from "@/actions/reminder";
+import { startTransition, useState } from "react";
+import { remove, update } from "@/actions/reminder";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const Reminder = ({ reminder }: { reminder: Rdv }) => {
   const { refresh } = useRouter();
+
+  const [isInputEdit, setIsInputEdit] = useState(false);
+  const [isTextEdit, setIsTextEdit] = useState(false);
+  const [name, setName] = useState<string>(reminder.name);
+  const [comment, setComment] = useState<string | null>(reminder.comment);
 
   const onDelete = () => {
     remove(reminder)
@@ -41,13 +48,52 @@ const Reminder = ({ reminder }: { reminder: Rdv }) => {
       .catch(() => toast.error("Une erreur est survenue!"));
   };
 
+  const handleUpdate = () => {
+    reminder.name = name;
+    reminder.comment = comment;
+
+    update(reminder)
+      .then((data) => {
+        if (data.success) {
+          toast.success(data.success);
+          refresh();
+        }
+        if (data.error) toast.error(data.error);
+      })
+      .catch(() => toast.error("Une erreur est survenue!"));
+
+    setIsInputEdit(false);
+    setIsTextEdit(false);
+  };
+
   return (
     <Card className="my-1">
       <CardHeader>
-        <CardTitle>Dr. {reminder.name}</CardTitle>
+        {isInputEdit ? (
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleUpdate}
+            onKeyDown={(e) => {
+              e.key === "Enter" ? handleUpdate : null;
+            }}
+            autoFocus
+          />
+        ) : (
+          <CardTitle onClick={() => setIsInputEdit(true)}>
+            Dr. {reminder.name}
+          </CardTitle>
+        )}
       </CardHeader>
-      <CardContent>
-        {reminder.comment ? (
+      <CardContent onClick={() => setIsTextEdit(true)}>
+        {isTextEdit ? (
+          <Textarea
+            value={comment as string}
+            onChange={(e) => setComment(e.target.value)}
+            onBlur={handleUpdate}
+            onKeyDown={handleUpdate}
+          />
+        ) : reminder.comment ? (
           `${reminder.comment}`
         ) : (
           <span className="text-sm text-muted-foreground">
@@ -62,12 +108,14 @@ const Reminder = ({ reminder }: { reminder: Rdv }) => {
             day: "numeric",
             month: "short",
             year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
           })}
         </span>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button size="icon" variant="destructive" type="button">
-              <Trash className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" />
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

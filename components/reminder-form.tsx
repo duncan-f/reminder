@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { SheetClose } from "./ui/sheet";
+import { TimePicker } from "./time-picker";
 
 const ReminderForm = () => {
   const router = useRouter();
@@ -91,7 +93,7 @@ const ReminderForm = () => {
                         )}
                       >
                         {field.value ? (
-                          format(field.value, "PPP")
+                          format(field.value, "PPP à HH:mm", { locale: fr })
                         ) : (
                           <span>Date du RDV</span>
                         )}
@@ -106,6 +108,9 @@ const ReminderForm = () => {
                       onSelect={field.onChange}
                       disabled={(date) => date < new Date()}
                     />
+                    <div className="p-3 border-t border-border">
+                      <TimePicker setDate={field.onChange} date={field.value} />
+                    </div>
                   </PopoverContent>
                 </Popover>
                 <FormMessage />

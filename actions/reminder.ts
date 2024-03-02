@@ -40,3 +40,22 @@ export const remove = async (reminder: Rdv) => {
 
   return { success: "Rendez-vous supprimé!" };
 };
+
+export const update = async (reminder: Rdv) => {
+  const user = await currentUser();
+
+  if (!user) return { error: "User not found!" };
+
+  if (user.id !== reminder.userId) return { error: "Unauthorized!" };
+
+  await prisma.rdv.update({
+    where: { id: reminder.id, userId: user.id },
+    data: {
+      name: reminder.name,
+      comment: reminder.comment,
+      dateRdv: reminder.dateRdv,
+    },
+  });
+
+  return { success: "Rendez-vous modifié!" };
+};

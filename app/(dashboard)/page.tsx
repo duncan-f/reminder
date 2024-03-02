@@ -1,5 +1,6 @@
 import Reminder from "@/components/reminder";
 import ReminderForm from "@/components/reminder-form";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { getRemindersByUserId } from "@/data/reminders";
 import { currentUser } from "@clerk/nextjs";
+import { AlertTriangle } from "lucide-react";
 
 export default async function Home() {
   const user = await currentUser();
@@ -40,9 +42,11 @@ export default async function Home() {
         </SheetContent>
       </Sheet>
       {reminders?.length === 0 ? (
-        <div className="text-muted-foreground text-center">
-          Liste vide! Ajoutez un rendez-vous.
-        </div>
+        <Alert>
+          <AlertTriangle className="w-4 h-4" />
+          <AlertTitle>Liste vide!</AlertTitle>
+          <AlertDescription>Ajoutez un rendez-vous.</AlertDescription>
+        </Alert>
       ) : (
         reminders?.map((reminder, index) => (
           <Reminder reminder={reminder} key={index} />
