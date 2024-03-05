@@ -5,6 +5,7 @@ import prisma from "@/lib/db";
 import { RdvSchema } from "@/schemas";
 import { currentUser } from "@clerk/nextjs";
 import { Rdv } from "@prisma/client";
+import scheduleNotifications from "./schedule-notification";
 
 export async function create(data: z.infer<typeof RdvSchema>) {
   const validated = RdvSchema.safeParse(data);
@@ -25,6 +26,8 @@ export async function create(data: z.infer<typeof RdvSchema>) {
       comment: comment as string,
     },
   });
+
+  scheduleNotifications(user.id);
 
   return { success: "Entrée ajoutée avec succé!" };
 }
